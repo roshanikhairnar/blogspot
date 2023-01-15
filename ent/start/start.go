@@ -34,12 +34,13 @@ func QueryUser(ctx context.Context, client *ent.Client) (*ent.User, error) {
 	log.Println("user returned: ", u)
 	return u, nil
 }
-func CreateBlog(ctx context.Context, client *ent.Client) (*ent.Blogs, error) {
+func CreateBlog(client *ent.Client, newBlog *ent.Blogs) (*ent.Blogs, error) {
+	ctx := context.Background()
 	u, err := client.Blogs.
 		Create().
-		SetBlogTitle("new trends").
-		SetBlogType("fashion").
-		SetBlogContent("jeans top are out of fashion....saree in").
+		SetBlogTitle(*newBlog.BlogTitle).
+		SetBlogType(*newBlog.BlogType).
+		SetBlogContent(*newBlog.BlogContent).
 		SetBlogAuthor("ayush").
 		SetOwnerID(1).
 		Save(ctx)
@@ -49,15 +50,44 @@ func CreateBlog(ctx context.Context, client *ent.Client) (*ent.Blogs, error) {
 	log.Println("blog was created: ", u)
 	return u, nil
 }
-func QueryBlog(ctx context.Context, client *ent.Client) (string, error) {
-	// u, err := client.Blogs.
-	// 	Query().
-	// 	Where((blogs.BlogTitleIn("new trends"))).
-	// 	Only(ctx)
-	v, err := client.Blogs.Get(ctx, 1)
+func QueryBlog(ctx context.Context, client *ent.Client, id int) (string, error) {
+	blog, err := client.Blogs.Get(ctx, id)
 	if err != nil {
 		return "", fmt.Errorf("failed querying blog: %w", err)
 	}
-	log.Println("blogs returned: ", v)
-	return v.String(), nil
+	log.Println("blog returned: ", blog)
+	return blog.String(), nil
+}
+func QueryAllBlogs(ctx context.Context, client *ent.Client) ([]*ent.Blogs, error) {
+	blogs, err := client.Blogs.Query().All(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed querying blog: %w", err)
+	}
+	log.Println("blogs returned: ", blogs)
+	return blogs, nil
+}
+
+func DeleteBlog(client *ent.Client, id int) error {
+	err := client.Blogs.DeleteOneID(id).Exec(context.Background())
+
+	if err != nil {
+		//gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return err
+	}
+	//gctx.JSON(http.StatusOK, "Success")
+
+	return nil
+}
+
+func UpdateBlog(client *ent.Client, id int, title string) (*ent.Blogs, error) {
+	ctx := context.Background()
+	_, err := QueryBlog(ctx, client, id)
+	if err != nil {
+		return nil, err
+	}
+	updatedBlog, err := client.Blogs.UpdateOneID(id).SetBlogTitle(title).Save(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return updatedBlog, nil
 }
