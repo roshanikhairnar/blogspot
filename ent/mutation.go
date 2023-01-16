@@ -669,7 +669,7 @@ type UserMutation struct {
 	typ           string
 	id            *int
 	name          *string
-	_type         *string
+	password      *string
 	clearedFields map[string]struct{}
 	blogs         map[int]struct{}
 	removedblogs  map[int]struct{}
@@ -813,40 +813,40 @@ func (m *UserMutation) ResetName() {
 	m.name = nil
 }
 
-// SetType sets the "type" field.
-func (m *UserMutation) SetType(s string) {
-	m._type = &s
+// SetPassword sets the "password" field.
+func (m *UserMutation) SetPassword(s string) {
+	m.password = &s
 }
 
-// GetType returns the value of the "type" field in the mutation.
-func (m *UserMutation) GetType() (r string, exists bool) {
-	v := m._type
+// Password returns the value of the "password" field in the mutation.
+func (m *UserMutation) Password() (r string, exists bool) {
+	v := m.password
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldType returns the old "type" field's value of the User entity.
+// OldPassword returns the old "password" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldType(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldPassword(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldType is only allowed on UpdateOne operations")
+		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldType requires an ID field in the mutation")
+		return v, errors.New("OldPassword requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
+		return v, fmt.Errorf("querying old value for OldPassword: %w", err)
 	}
-	return oldValue.Type, nil
+	return oldValue.Password, nil
 }
 
-// ResetType resets all changes to the "type" field.
-func (m *UserMutation) ResetType() {
-	m._type = nil
+// ResetPassword resets all changes to the "password" field.
+func (m *UserMutation) ResetPassword() {
+	m.password = nil
 }
 
 // AddBlogIDs adds the "blogs" edge to the Blogs entity by ids.
@@ -941,8 +941,8 @@ func (m *UserMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
 	}
-	if m._type != nil {
-		fields = append(fields, user.FieldType)
+	if m.password != nil {
+		fields = append(fields, user.FieldPassword)
 	}
 	return fields
 }
@@ -954,8 +954,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case user.FieldName:
 		return m.Name()
-	case user.FieldType:
-		return m.GetType()
+	case user.FieldPassword:
+		return m.Password()
 	}
 	return nil, false
 }
@@ -967,8 +967,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case user.FieldName:
 		return m.OldName(ctx)
-	case user.FieldType:
-		return m.OldType(ctx)
+	case user.FieldPassword:
+		return m.OldPassword(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -985,12 +985,12 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case user.FieldType:
+	case user.FieldPassword:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetType(v)
+		m.SetPassword(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -1044,8 +1044,8 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldName:
 		m.ResetName()
 		return nil
-	case user.FieldType:
-		m.ResetType()
+	case user.FieldPassword:
+		m.ResetPassword()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

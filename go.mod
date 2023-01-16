@@ -4,6 +4,8 @@ go 1.19
 
 require (
 	entgo.io/ent v0.11.5
+	github.com/coreos/etcd v3.3.27+incompatible
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.8.2
 )
 

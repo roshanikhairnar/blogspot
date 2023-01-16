@@ -12,7 +12,7 @@ func CreateUser(ctx context.Context, client *ent.Client) (*ent.User, error) {
 	u, err := client.User.
 		Create().
 		SetName("ayush").
-		SetType("admin").
+		SetPassword("dfxcghbjkl").
 		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating user: %w", err)
@@ -21,10 +21,23 @@ func CreateUser(ctx context.Context, client *ent.Client) (*ent.User, error) {
 	return u, nil
 }
 
-func QueryUser(ctx context.Context, client *ent.Client) (*ent.User, error) {
+func QueryUserByName(ctx context.Context, client *ent.Client, name string) (*ent.User, error) {
 	u, err := client.User.
 		Query().
-		Where(user.Name("a8m")).
+		Where(user.Name(name)).
+		// `Only` fails if no user found,
+		// or more than 1 user returned.
+		Only(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed querying user: %w", err)
+	}
+	log.Println("user returned: ", u)
+	return u, nil
+}
+func QueryUserById(ctx context.Context, client *ent.Client, id int) (*ent.User, error) {
+	u, err := client.User.
+		Query().
+		Where(user.ID(id)).
 		// `Only` fails if no user found,
 		// or more than 1 user returned.
 		Only(ctx)

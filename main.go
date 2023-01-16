@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"entdemo/ent"
+	auth "entdemo/ent/authentication"
 	start "entdemo/ent/start"
 	"fmt"
 	"log"
@@ -12,8 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
-
-var EntClient *ent.Client
 
 func main() {
 	client, err := ent.Open("postgres", "host=localhost port=5432 user=roshani dbname=entdemo password='roshani@123'")
@@ -25,23 +24,33 @@ func main() {
 	if err := client.Schema.Create(context.Background()); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
-	EntClient = client
+	ent.EntClient = client
 	initRoutes(client)
 }
 func initRoutes(client *ent.Client) {
 	r := gin.Default()
+
+	public := r.Group("/api")
+
+	public.POST("/register", auth.Register)
+	public.POST("/login", auth.Login)
+	admin := r.Group("/api/admin")
+	admin.Use(auth.JwtAuthMiddleware())
+	admin.GET("/user", auth.CurrentUser)
+
 	r.GET("/blogs/:id", getBlog)
 	r.GET("/blogs", getAllBlogs)
-	r.DELETE("/deleteBlog/:id", deleteBlog)
-	r.PUT("/updateblog/:id", updateBlog)
-	r.POST("/createblog", createBlog)
+	admin.DELETE("/deleteBlog/:id", deleteBlog)
+	admin.PUT("/updateblog/:id", updateBlog)
+	admin.POST("/createblog", createBlog)
+
 	r.Run()
 }
 func getBlog(gctx *gin.Context) {
 	ctx := context.Background()
 	id := gctx.Param("id")
 	blogID, _ := strconv.Atoi(id)
-	blog, err := start.QueryBlog(ctx, EntClient, blogID)
+	blog, err := start.QueryBlog(ctx, ent.EntClient, blogID)
 	if err != nil {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -51,7 +60,7 @@ func getBlog(gctx *gin.Context) {
 func getAllBlogs(gctx *gin.Context) {
 	ctx := context.Background()
 
-	blogs, err := start.QueryAllBlogs(ctx, EntClient)
+	blogs, err := start.QueryAllBlogs(ctx, ent.EntClient)
 	if err != nil {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -62,7 +71,7 @@ func getAllBlogs(gctx *gin.Context) {
 func deleteBlog(gctx *gin.Context) {
 	id := gctx.Param("id")
 	blogID, _ := strconv.Atoi(id)
-	err := start.DeleteBlog(EntClient, blogID)
+	err := start.DeleteBlog(ent.EntClient, blogID)
 	if err != nil {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -79,7 +88,7 @@ func updateBlog(gctx *gin.Context) {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	blogupdated, err := start.UpdateBlog(EntClient, blogID, blog.BlogTitle)
+	blogupdated, err := start.UpdateBlog(ent.EntClient, blogID, blog.BlogTitle)
 	fmt.Println("updatedblog", blogupdated)
 	if err != nil {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -92,7 +101,7 @@ func createBlog(gctx *gin.Context) {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	newBlog, err := start.CreateBlog(EntClient, newBlog)
+	newBlog, err := start.CreateBlog(ent.EntClient, newBlog)
 	fmt.Println("newblog", newBlog)
 	if err != nil {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

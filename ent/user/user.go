@@ -9,8 +9,8 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
+	// FieldPassword holds the string denoting the password field in the database.
+	FieldPassword = "password"
 	// EdgeBlogs holds the string denoting the blogs edge name in mutations.
 	EdgeBlogs = "blogs"
 	// Table holds the table name of the user in the database.
@@ -28,7 +28,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
-	FieldType,
+	FieldPassword,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

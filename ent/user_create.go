@@ -26,9 +26,9 @@ func (uc *UserCreate) SetName(s string) *UserCreate {
 	return uc
 }
 
-// SetType sets the "type" field.
-func (uc *UserCreate) SetType(s string) *UserCreate {
-	uc.mutation.SetType(s)
+// SetPassword sets the "password" field.
+func (uc *UserCreate) SetPassword(s string) *UserCreate {
+	uc.mutation.SetPassword(s)
 	return uc
 }
 
@@ -84,8 +84,8 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "User.name"`)}
 	}
-	if _, ok := uc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "User.type"`)}
+	if _, ok := uc.mutation.Password(); !ok {
+		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
 	}
 	return nil
 }
@@ -123,9 +123,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := uc.mutation.GetType(); ok {
-		_spec.SetField(user.FieldType, field.TypeString, value)
-		_node.Type = value
+	if value, ok := uc.mutation.Password(); ok {
+		_spec.SetField(user.FieldPassword, field.TypeString, value)
+		_node.Password = value
 	}
 	if nodes := uc.mutation.BlogsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

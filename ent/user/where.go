@@ -59,9 +59,9 @@ func Name(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldName, v))
 }
 
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldType, v))
+// Password applies equality check predicate on the "password" field. It's identical to PasswordEQ.
+func Password(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldPassword, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -129,69 +129,69 @@ func NameContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldName, v))
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldType, v))
+// PasswordEQ applies the EQ predicate on the "password" field.
+func PasswordEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldPassword, v))
 }
 
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldType, v))
+// PasswordNEQ applies the NEQ predicate on the "password" field.
+func PasswordNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldPassword, v))
 }
 
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldType, vs...))
+// PasswordIn applies the In predicate on the "password" field.
+func PasswordIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldPassword, vs...))
 }
 
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldType, vs...))
+// PasswordNotIn applies the NotIn predicate on the "password" field.
+func PasswordNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldPassword, vs...))
 }
 
-// TypeGT applies the GT predicate on the "type" field.
-func TypeGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldType, v))
+// PasswordGT applies the GT predicate on the "password" field.
+func PasswordGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldPassword, v))
 }
 
-// TypeGTE applies the GTE predicate on the "type" field.
-func TypeGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldType, v))
+// PasswordGTE applies the GTE predicate on the "password" field.
+func PasswordGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldPassword, v))
 }
 
-// TypeLT applies the LT predicate on the "type" field.
-func TypeLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldType, v))
+// PasswordLT applies the LT predicate on the "password" field.
+func PasswordLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldPassword, v))
 }
 
-// TypeLTE applies the LTE predicate on the "type" field.
-func TypeLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldType, v))
+// PasswordLTE applies the LTE predicate on the "password" field.
+func PasswordLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldPassword, v))
 }
 
-// TypeContains applies the Contains predicate on the "type" field.
-func TypeContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldType, v))
+// PasswordContains applies the Contains predicate on the "password" field.
+func PasswordContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldPassword, v))
 }
 
-// TypeHasPrefix applies the HasPrefix predicate on the "type" field.
-func TypeHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldType, v))
+// PasswordHasPrefix applies the HasPrefix predicate on the "password" field.
+func PasswordHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldPassword, v))
 }
 
-// TypeHasSuffix applies the HasSuffix predicate on the "type" field.
-func TypeHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldType, v))
+// PasswordHasSuffix applies the HasSuffix predicate on the "password" field.
+func PasswordHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldPassword, v))
 }
 
-// TypeEqualFold applies the EqualFold predicate on the "type" field.
-func TypeEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldType, v))
+// PasswordEqualFold applies the EqualFold predicate on the "password" field.
+func PasswordEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldPassword, v))
 }
 
-// TypeContainsFold applies the ContainsFold predicate on the "type" field.
-func TypeContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldType, v))
+// PasswordContainsFold applies the ContainsFold predicate on the "password" field.
+func PasswordContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldPassword, v))
 }
 
 // HasBlogs applies the HasEdge predicate on the "blogs" edge.
