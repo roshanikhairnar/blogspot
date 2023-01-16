@@ -38,7 +38,7 @@ Go to the project directory
 #### Create admin account
 collect token generated after making the request, might need it for authorisation if you want to perform CRUD operation
 
-```http
+```
   POST /api/register
 ```
 
@@ -48,7 +48,7 @@ collect token generated after making the request, might need it for authorisatio
 | `password`      | `string` | **Required**. password for login |
 
 ### Login as admin
-```http
+```
   POST /api/login
 ```
 
@@ -58,7 +58,7 @@ collect token generated after making the request, might need it for authorisatio
 | `password`      | `string` | **Required**. password for login |
 
 ### Create blog
-```http
+```
   POST /api/admin/createblog
 ```
 | Parameter | Type     | Description                       |
@@ -69,7 +69,7 @@ collect token generated after making the request, might need it for authorisatio
 | `blogAuthor`      | `string` | **Required**. author of blog |
 
 ### Delete blog
-```http
+```
 DELETE /api/admin/deleteblog/{$id}
 ```
 | Parameter | Type     | Description                       |
@@ -77,7 +77,7 @@ DELETE /api/admin/deleteblog/{$id}
 | `id`      | `int` | **Required**. id of blog |
 
 ### Update blog
-```http
+```
 PUT /api/admin/updateblog/{$id}
  ```
  | Parameter | Type     | Description                       |
