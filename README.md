@@ -19,6 +19,8 @@ Clone the project
 ```
 
 Go to the project directory
+go ro the main.go file.
+change the credentials of postgres db in the main function.
 
 ```bash
   go run main.go
