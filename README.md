@@ -1,6 +1,5 @@
 # blogspot
 
-# Project Title
 
 REST API for blog using golang, gin framework & ent ORM.
 
