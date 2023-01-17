@@ -54,13 +54,14 @@ func CreateBlog(client *ent.Client, newBlog *ent.Blogs) (*ent.Blogs, error) {
 		SetBlogTitle(*newBlog.BlogTitle).
 		SetBlogType(*newBlog.BlogType).
 		SetBlogContent(*newBlog.BlogContent).
-		SetBlogAuthor("ayush").
-		SetOwnerID(1).
+		SetBlogAuthor(*newBlog.BlogAuthor).
+		//SetOwnerID().
 		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating blog: %w", err)
 	}
 	log.Println("blog was created: ", u)
+
 	return u, nil
 }
 func QueryBlog(ctx context.Context, client *ent.Client, id int) (string, error) {
@@ -84,10 +85,8 @@ func DeleteBlog(client *ent.Client, id int) error {
 	err := client.Blogs.DeleteOneID(id).Exec(context.Background())
 
 	if err != nil {
-		//gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return err
 	}
-	//gctx.JSON(http.StatusOK, "Success")
 
 	return nil
 }

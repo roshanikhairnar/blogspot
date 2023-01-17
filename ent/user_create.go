@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"entdemo/ent/blogs"
 	"entdemo/ent/user"
 	"errors"
 	"fmt"
@@ -30,21 +29,6 @@ func (uc *UserCreate) SetName(s string) *UserCreate {
 func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	uc.mutation.SetPassword(s)
 	return uc
-}
-
-// AddBlogIDs adds the "blogs" edge to the Blogs entity by IDs.
-func (uc *UserCreate) AddBlogIDs(ids ...int) *UserCreate {
-	uc.mutation.AddBlogIDs(ids...)
-	return uc
-}
-
-// AddBlogs adds the "blogs" edges to the Blogs entity.
-func (uc *UserCreate) AddBlogs(b ...*Blogs) *UserCreate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return uc.AddBlogIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -126,25 +110,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
-	}
-	if nodes := uc.mutation.BlogsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.BlogsTable,
-			Columns: []string{user.BlogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: blogs.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

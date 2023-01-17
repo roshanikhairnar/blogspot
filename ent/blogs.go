@@ -4,7 +4,6 @@ package ent
 
 import (
 	"entdemo/ent/blogs"
-	"entdemo/ent/user"
 	"fmt"
 	"strings"
 
@@ -24,32 +23,6 @@ type Blogs struct {
 	BlogContent *string `json:"blogContent,omitempty"`
 	// BlogAuthor holds the value of the "blogAuthor" field.
 	BlogAuthor *string `json:"blogAuthor,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the BlogsQuery when eager-loading is set.
-	Edges      BlogsEdges `json:"edges"`
-	user_blogs *int
-}
-
-// BlogsEdges holds the relations/edges for other nodes in the graph.
-type BlogsEdges struct {
-	// Owner holds the value of the owner edge.
-	Owner *User `json:"owner,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-}
-
-// OwnerOrErr returns the Owner value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e BlogsEdges) OwnerOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.Owner == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
-		return e.Owner, nil
-	}
-	return nil, &NotLoadedError{edge: "owner"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -61,8 +34,6 @@ func (*Blogs) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case blogs.FieldBlogTitle, blogs.FieldBlogType, blogs.FieldBlogContent, blogs.FieldBlogAuthor:
 			values[i] = new(sql.NullString)
-		case blogs.ForeignKeys[0]: // user_blogs
-			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Blogs", columns[i])
 		}
@@ -112,21 +83,9 @@ func (b *Blogs) assignValues(columns []string, values []any) error {
 				b.BlogAuthor = new(string)
 				*b.BlogAuthor = value.String
 			}
-		case blogs.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_blogs", value)
-			} else if value.Valid {
-				b.user_blogs = new(int)
-				*b.user_blogs = int(value.Int64)
-			}
 		}
 	}
 	return nil
-}
-
-// QueryOwner queries the "owner" edge of the Blogs entity.
-func (b *Blogs) QueryOwner() *UserQuery {
-	return (&BlogsClient{config: b.config}).QueryOwner(b)
 }
 
 // Update returns a builder for updating this Blogs.

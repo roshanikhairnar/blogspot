@@ -39,8 +39,6 @@ type BlogsMutation struct {
 	blogContent   *string
 	blogAuthor    *string
 	clearedFields map[string]struct{}
-	owner         *int
-	clearedowner  bool
 	done          bool
 	oldValue      func(context.Context) (*Blogs, error)
 	predicates    []predicate.Blogs
@@ -340,45 +338,6 @@ func (m *BlogsMutation) ResetBlogAuthor() {
 	delete(m.clearedFields, blogs.FieldBlogAuthor)
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by id.
-func (m *BlogsMutation) SetOwnerID(id int) {
-	m.owner = &id
-}
-
-// ClearOwner clears the "owner" edge to the User entity.
-func (m *BlogsMutation) ClearOwner() {
-	m.clearedowner = true
-}
-
-// OwnerCleared reports if the "owner" edge to the User entity was cleared.
-func (m *BlogsMutation) OwnerCleared() bool {
-	return m.clearedowner
-}
-
-// OwnerID returns the "owner" edge ID in the mutation.
-func (m *BlogsMutation) OwnerID() (id int, exists bool) {
-	if m.owner != nil {
-		return *m.owner, true
-	}
-	return
-}
-
-// OwnerIDs returns the "owner" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// OwnerID instead. It exists only for internal usage by the builders.
-func (m *BlogsMutation) OwnerIDs() (ids []int) {
-	if id := m.owner; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetOwner resets all changes to the "owner" edge.
-func (m *BlogsMutation) ResetOwner() {
-	m.owner = nil
-	m.clearedowner = false
-}
-
 // Where appends a list predicates to the BlogsMutation builder.
 func (m *BlogsMutation) Where(ps ...predicate.Blogs) {
 	m.predicates = append(m.predicates, ps...)
@@ -590,28 +549,19 @@ func (m *BlogsMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BlogsMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.owner != nil {
-		edges = append(edges, blogs.EdgeOwner)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *BlogsMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case blogs.EdgeOwner:
-		if id := m.owner; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BlogsMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
@@ -623,42 +573,25 @@ func (m *BlogsMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BlogsMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedowner {
-		edges = append(edges, blogs.EdgeOwner)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *BlogsMutation) EdgeCleared(name string) bool {
-	switch name {
-	case blogs.EdgeOwner:
-		return m.clearedowner
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *BlogsMutation) ClearEdge(name string) error {
-	switch name {
-	case blogs.EdgeOwner:
-		m.ClearOwner()
-		return nil
-	}
 	return fmt.Errorf("unknown Blogs unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *BlogsMutation) ResetEdge(name string) error {
-	switch name {
-	case blogs.EdgeOwner:
-		m.ResetOwner()
-		return nil
-	}
 	return fmt.Errorf("unknown Blogs edge %s", name)
 }
 
@@ -671,9 +604,6 @@ type UserMutation struct {
 	name          *string
 	password      *string
 	clearedFields map[string]struct{}
-	blogs         map[int]struct{}
-	removedblogs  map[int]struct{}
-	clearedblogs  bool
 	done          bool
 	oldValue      func(context.Context) (*User, error)
 	predicates    []predicate.User
@@ -849,60 +779,6 @@ func (m *UserMutation) ResetPassword() {
 	m.password = nil
 }
 
-// AddBlogIDs adds the "blogs" edge to the Blogs entity by ids.
-func (m *UserMutation) AddBlogIDs(ids ...int) {
-	if m.blogs == nil {
-		m.blogs = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.blogs[ids[i]] = struct{}{}
-	}
-}
-
-// ClearBlogs clears the "blogs" edge to the Blogs entity.
-func (m *UserMutation) ClearBlogs() {
-	m.clearedblogs = true
-}
-
-// BlogsCleared reports if the "blogs" edge to the Blogs entity was cleared.
-func (m *UserMutation) BlogsCleared() bool {
-	return m.clearedblogs
-}
-
-// RemoveBlogIDs removes the "blogs" edge to the Blogs entity by IDs.
-func (m *UserMutation) RemoveBlogIDs(ids ...int) {
-	if m.removedblogs == nil {
-		m.removedblogs = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.blogs, ids[i])
-		m.removedblogs[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedBlogs returns the removed IDs of the "blogs" edge to the Blogs entity.
-func (m *UserMutation) RemovedBlogsIDs() (ids []int) {
-	for id := range m.removedblogs {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// BlogsIDs returns the "blogs" edge IDs in the mutation.
-func (m *UserMutation) BlogsIDs() (ids []int) {
-	for id := range m.blogs {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetBlogs resets all changes to the "blogs" edge.
-func (m *UserMutation) ResetBlogs() {
-	m.blogs = nil
-	m.clearedblogs = false
-	m.removedblogs = nil
-}
-
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -1053,84 +929,48 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.blogs != nil {
-		edges = append(edges, user.EdgeBlogs)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case user.EdgeBlogs:
-		ids := make([]ent.Value, 0, len(m.blogs))
-		for id := range m.blogs {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedblogs != nil {
-		edges = append(edges, user.EdgeBlogs)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case user.EdgeBlogs:
-		ids := make([]ent.Value, 0, len(m.removedblogs))
-		for id := range m.removedblogs {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedblogs {
-		edges = append(edges, user.EdgeBlogs)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
-	switch name {
-	case user.EdgeBlogs:
-		return m.clearedblogs
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *UserMutation) ClearEdge(name string) error {
-	switch name {
-	}
 	return fmt.Errorf("unknown User unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
-	switch name {
-	case user.EdgeBlogs:
-		m.ResetBlogs()
-		return nil
-	}
 	return fmt.Errorf("unknown User edge %s", name)
 }

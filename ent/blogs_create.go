@@ -5,7 +5,6 @@ package ent
 import (
 	"context"
 	"entdemo/ent/blogs"
-	"entdemo/ent/user"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -73,25 +72,6 @@ func (bc *BlogsCreate) SetNillableBlogAuthor(s *string) *BlogsCreate {
 		bc.SetBlogAuthor(*s)
 	}
 	return bc
-}
-
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (bc *BlogsCreate) SetOwnerID(id int) *BlogsCreate {
-	bc.mutation.SetOwnerID(id)
-	return bc
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (bc *BlogsCreate) SetNillableOwnerID(id *int) *BlogsCreate {
-	if id != nil {
-		bc = bc.SetOwnerID(*id)
-	}
-	return bc
-}
-
-// SetOwner sets the "owner" edge to the User entity.
-func (bc *BlogsCreate) SetOwner(u *User) *BlogsCreate {
-	return bc.SetOwnerID(u.ID)
 }
 
 // Mutation returns the BlogsMutation object of the builder.
@@ -175,26 +155,6 @@ func (bc *BlogsCreate) createSpec() (*Blogs, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.BlogAuthor(); ok {
 		_spec.SetField(blogs.FieldBlogAuthor, field.TypeString, value)
 		_node.BlogAuthor = &value
-	}
-	if nodes := bc.mutation.OwnerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   blogs.OwnerTable,
-			Columns: []string{blogs.OwnerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.user_blogs = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

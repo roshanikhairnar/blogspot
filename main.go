@@ -27,12 +27,13 @@ func main() {
 	ent.EntClient = client
 	initRoutes(client)
 }
+
 func initRoutes(client *ent.Client) {
 	r := gin.Default()
 
 	public := r.Group("/api")
 
-	public.POST("/register", auth.Register)
+	//public.POST("/register", auth.Register)
 	public.POST("/login", auth.Login)
 	admin := r.Group("/api/admin")
 	admin.Use(auth.JwtAuthMiddleware())
@@ -76,7 +77,7 @@ func deleteBlog(gctx *gin.Context) {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	gctx.JSON(http.StatusOK, "Success")
+	gctx.JSON(http.StatusOK, "Successfully deleted the blog")
 }
 func updateBlog(gctx *gin.Context) {
 	id := gctx.Param("id")
@@ -94,6 +95,7 @@ func updateBlog(gctx *gin.Context) {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	gctx.JSON(http.StatusOK, "Successfully updated the blog")
 }
 func createBlog(gctx *gin.Context) {
 	newBlog := new(ent.Blogs)
@@ -107,4 +109,5 @@ func createBlog(gctx *gin.Context) {
 		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	gctx.JSON(http.StatusOK, "Successfully created the blog")
 }

@@ -6,7 +6,6 @@ import (
 	"context"
 	"entdemo/ent/blogs"
 	"entdemo/ent/predicate"
-	"entdemo/ent/user"
 	"errors"
 	"fmt"
 
@@ -108,34 +107,9 @@ func (bu *BlogsUpdate) ClearBlogAuthor() *BlogsUpdate {
 	return bu
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (bu *BlogsUpdate) SetOwnerID(id int) *BlogsUpdate {
-	bu.mutation.SetOwnerID(id)
-	return bu
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (bu *BlogsUpdate) SetNillableOwnerID(id *int) *BlogsUpdate {
-	if id != nil {
-		bu = bu.SetOwnerID(*id)
-	}
-	return bu
-}
-
-// SetOwner sets the "owner" edge to the User entity.
-func (bu *BlogsUpdate) SetOwner(u *User) *BlogsUpdate {
-	return bu.SetOwnerID(u.ID)
-}
-
 // Mutation returns the BlogsMutation object of the builder.
 func (bu *BlogsUpdate) Mutation() *BlogsMutation {
 	return bu.mutation
-}
-
-// ClearOwner clears the "owner" edge to the User entity.
-func (bu *BlogsUpdate) ClearOwner() *BlogsUpdate {
-	bu.mutation.ClearOwner()
-	return bu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -206,41 +180,6 @@ func (bu *BlogsUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if bu.mutation.BlogAuthorCleared() {
 		_spec.ClearField(blogs.FieldBlogAuthor, field.TypeString)
-	}
-	if bu.mutation.OwnerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   blogs.OwnerTable,
-			Columns: []string{blogs.OwnerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := bu.mutation.OwnerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   blogs.OwnerTable,
-			Columns: []string{blogs.OwnerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, bu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -342,34 +281,9 @@ func (buo *BlogsUpdateOne) ClearBlogAuthor() *BlogsUpdateOne {
 	return buo
 }
 
-// SetOwnerID sets the "owner" edge to the User entity by ID.
-func (buo *BlogsUpdateOne) SetOwnerID(id int) *BlogsUpdateOne {
-	buo.mutation.SetOwnerID(id)
-	return buo
-}
-
-// SetNillableOwnerID sets the "owner" edge to the User entity by ID if the given value is not nil.
-func (buo *BlogsUpdateOne) SetNillableOwnerID(id *int) *BlogsUpdateOne {
-	if id != nil {
-		buo = buo.SetOwnerID(*id)
-	}
-	return buo
-}
-
-// SetOwner sets the "owner" edge to the User entity.
-func (buo *BlogsUpdateOne) SetOwner(u *User) *BlogsUpdateOne {
-	return buo.SetOwnerID(u.ID)
-}
-
 // Mutation returns the BlogsMutation object of the builder.
 func (buo *BlogsUpdateOne) Mutation() *BlogsMutation {
 	return buo.mutation
-}
-
-// ClearOwner clears the "owner" edge to the User entity.
-func (buo *BlogsUpdateOne) ClearOwner() *BlogsUpdateOne {
-	buo.mutation.ClearOwner()
-	return buo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -464,41 +378,6 @@ func (buo *BlogsUpdateOne) sqlSave(ctx context.Context) (_node *Blogs, err error
 	}
 	if buo.mutation.BlogAuthorCleared() {
 		_spec.ClearField(blogs.FieldBlogAuthor, field.TypeString)
-	}
-	if buo.mutation.OwnerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   blogs.OwnerTable,
-			Columns: []string{blogs.OwnerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := buo.mutation.OwnerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   blogs.OwnerTable,
-			Columns: []string{blogs.OwnerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Blogs{config: buo.config}
 	_spec.Assign = _node.assignValues

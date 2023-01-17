@@ -15,21 +15,12 @@ var (
 		{Name: "blog_type", Type: field.TypeString, Nullable: true},
 		{Name: "blog_content", Type: field.TypeString, Nullable: true},
 		{Name: "blog_author", Type: field.TypeString, Nullable: true},
-		{Name: "user_blogs", Type: field.TypeInt, Nullable: true},
 	}
 	// BlogsTable holds the schema information for the "blogs" table.
 	BlogsTable = &schema.Table{
 		Name:       "blogs",
 		Columns:    BlogsColumns,
 		PrimaryKey: []*schema.Column{BlogsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "blogs_users_blogs",
-				Columns:    []*schema.Column{BlogsColumns[5]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -51,5 +42,4 @@ var (
 )
 
 func init() {
-	BlogsTable.ForeignKeys[0].RefTable = UsersTable
 }

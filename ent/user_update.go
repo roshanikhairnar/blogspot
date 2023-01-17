@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"entdemo/ent/blogs"
 	"entdemo/ent/predicate"
 	"entdemo/ent/user"
 	"errors"
@@ -40,45 +39,9 @@ func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
 	return uu
 }
 
-// AddBlogIDs adds the "blogs" edge to the Blogs entity by IDs.
-func (uu *UserUpdate) AddBlogIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddBlogIDs(ids...)
-	return uu
-}
-
-// AddBlogs adds the "blogs" edges to the Blogs entity.
-func (uu *UserUpdate) AddBlogs(b ...*Blogs) *UserUpdate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return uu.AddBlogIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
-}
-
-// ClearBlogs clears all "blogs" edges to the Blogs entity.
-func (uu *UserUpdate) ClearBlogs() *UserUpdate {
-	uu.mutation.ClearBlogs()
-	return uu
-}
-
-// RemoveBlogIDs removes the "blogs" edge to Blogs entities by IDs.
-func (uu *UserUpdate) RemoveBlogIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveBlogIDs(ids...)
-	return uu
-}
-
-// RemoveBlogs removes "blogs" edges to Blogs entities.
-func (uu *UserUpdate) RemoveBlogs(b ...*Blogs) *UserUpdate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return uu.RemoveBlogIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -132,60 +95,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
-	if uu.mutation.BlogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.BlogsTable,
-			Columns: []string{user.BlogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: blogs.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedBlogsIDs(); len(nodes) > 0 && !uu.mutation.BlogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.BlogsTable,
-			Columns: []string{user.BlogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: blogs.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.BlogsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.BlogsTable,
-			Columns: []string{user.BlogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: blogs.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -218,45 +127,9 @@ func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
 	return uuo
 }
 
-// AddBlogIDs adds the "blogs" edge to the Blogs entity by IDs.
-func (uuo *UserUpdateOne) AddBlogIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddBlogIDs(ids...)
-	return uuo
-}
-
-// AddBlogs adds the "blogs" edges to the Blogs entity.
-func (uuo *UserUpdateOne) AddBlogs(b ...*Blogs) *UserUpdateOne {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return uuo.AddBlogIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
-}
-
-// ClearBlogs clears all "blogs" edges to the Blogs entity.
-func (uuo *UserUpdateOne) ClearBlogs() *UserUpdateOne {
-	uuo.mutation.ClearBlogs()
-	return uuo
-}
-
-// RemoveBlogIDs removes the "blogs" edge to Blogs entities by IDs.
-func (uuo *UserUpdateOne) RemoveBlogIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveBlogIDs(ids...)
-	return uuo
-}
-
-// RemoveBlogs removes "blogs" edges to Blogs entities.
-func (uuo *UserUpdateOne) RemoveBlogs(b ...*Blogs) *UserUpdateOne {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return uuo.RemoveBlogIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -333,60 +206,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
-	}
-	if uuo.mutation.BlogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.BlogsTable,
-			Columns: []string{user.BlogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: blogs.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedBlogsIDs(); len(nodes) > 0 && !uuo.mutation.BlogsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.BlogsTable,
-			Columns: []string{user.BlogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: blogs.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.BlogsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.BlogsTable,
-			Columns: []string{user.BlogsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: blogs.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

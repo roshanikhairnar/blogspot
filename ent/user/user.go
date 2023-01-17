@@ -11,17 +11,8 @@ const (
 	FieldName = "name"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
-	// EdgeBlogs holds the string denoting the blogs edge name in mutations.
-	EdgeBlogs = "blogs"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// BlogsTable is the table that holds the blogs relation/edge.
-	BlogsTable = "blogs"
-	// BlogsInverseTable is the table name for the Blogs entity.
-	// It exists in this package in order to avoid circular dependency with the "blogs" package.
-	BlogsInverseTable = "blogs"
-	// BlogsColumn is the table column denoting the blogs relation/edge.
-	BlogsColumn = "user_blogs"
 )
 
 // Columns holds all SQL columns for user fields.

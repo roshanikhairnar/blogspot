@@ -6,7 +6,6 @@ import (
 	"context"
 	"entdemo/ent/blogs"
 	"entdemo/ent/predicate"
-	"entdemo/ent/user"
 	"fmt"
 	"math"
 
@@ -25,8 +24,6 @@ type BlogsQuery struct {
 	fields     []string
 	inters     []Interceptor
 	predicates []predicate.Blogs
-	withOwner  *UserQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,28 +58,6 @@ func (bq *BlogsQuery) Unique(unique bool) *BlogsQuery {
 func (bq *BlogsQuery) Order(o ...OrderFunc) *BlogsQuery {
 	bq.order = append(bq.order, o...)
 	return bq
-}
-
-// QueryOwner chains the current query on the "owner" edge.
-func (bq *BlogsQuery) QueryOwner() *UserQuery {
-	query := (&UserClient{config: bq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := bq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := bq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(blogs.Table, blogs.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, blogs.OwnerTable, blogs.OwnerColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Blogs entity from the query.
@@ -276,23 +251,11 @@ func (bq *BlogsQuery) Clone() *BlogsQuery {
 		order:      append([]OrderFunc{}, bq.order...),
 		inters:     append([]Interceptor{}, bq.inters...),
 		predicates: append([]predicate.Blogs{}, bq.predicates...),
-		withOwner:  bq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:    bq.sql.Clone(),
 		path:   bq.path,
 		unique: bq.unique,
 	}
-}
-
-// WithOwner tells the query-builder to eager-load the nodes that are connected to
-// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
-func (bq *BlogsQuery) WithOwner(opts ...func(*UserQuery)) *BlogsQuery {
-	query := (&UserClient{config: bq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	bq.withOwner = query
-	return bq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -371,26 +334,15 @@ func (bq *BlogsQuery) prepareQuery(ctx context.Context) error {
 
 func (bq *BlogsQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Blogs, error) {
 	var (
-		nodes       = []*Blogs{}
-		withFKs     = bq.withFKs
-		_spec       = bq.querySpec()
-		loadedTypes = [1]bool{
-			bq.withOwner != nil,
-		}
+		nodes = []*Blogs{}
+		_spec = bq.querySpec()
 	)
-	if bq.withOwner != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, blogs.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Blogs).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Blogs{config: bq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -402,43 +354,7 @@ func (bq *BlogsQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Blogs,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := bq.withOwner; query != nil {
-		if err := bq.loadOwner(ctx, query, nodes, nil,
-			func(n *Blogs, e *User) { n.Edges.Owner = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (bq *BlogsQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*Blogs, init func(*Blogs), assign func(*Blogs, *User)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Blogs)
-	for i := range nodes {
-		if nodes[i].user_blogs == nil {
-			continue
-		}
-		fk := *nodes[i].user_blogs
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	query.Where(user.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_blogs" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (bq *BlogsQuery) sqlCount(ctx context.Context) (int, error) {
