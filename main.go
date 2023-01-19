@@ -2,13 +2,10 @@ package main
 
 import (
 	"context"
+	auth "entdemo/authentication"
 	"entdemo/ent"
-	auth "entdemo/ent/authentication"
-	start "entdemo/ent/start"
-	"fmt"
+	handler "entdemo/handlers"
 	"log"
-	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -39,75 +36,11 @@ func initRoutes(client *ent.Client) {
 	admin.Use(auth.JwtAuthMiddleware())
 	admin.GET("/user", auth.CurrentUser)
 
-	r.GET("/blogs/:id", getBlog)
-	r.GET("/blogs", getAllBlogs)
-	admin.DELETE("/deleteBlog/:id", deleteBlog)
-	admin.PUT("/updateblog/:id", updateBlog)
-	admin.POST("/createblog", createBlog)
+	r.GET("/blogs/:id", handler.GetBlog)
+	r.GET("/blogs", handler.GetAllBlogs)
+	admin.DELETE("/deleteBlog/:id", handler.DeleteBlog)
+	admin.PUT("/updateblog/:id", handler.UpdateBlog)
+	admin.POST("/createblog", handler.CreateBlog)
 
 	r.Run()
-}
-func getBlog(gctx *gin.Context) {
-	ctx := context.Background()
-	id := gctx.Param("id")
-	blogID, _ := strconv.Atoi(id)
-	blog, err := start.QueryBlog(ctx, ent.EntClient, blogID)
-	if err != nil {
-		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	gctx.JSON(http.StatusOK, gin.H{"data": blog})
-}
-func getAllBlogs(gctx *gin.Context) {
-	ctx := context.Background()
-
-	blogs, err := start.QueryAllBlogs(ctx, ent.EntClient)
-	if err != nil {
-		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	gctx.JSON(http.StatusOK, gin.H{"data": blogs})
-}
-
-func deleteBlog(gctx *gin.Context) {
-	id := gctx.Param("id")
-	blogID, _ := strconv.Atoi(id)
-	err := start.DeleteBlog(ent.EntClient, blogID)
-	if err != nil {
-		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	gctx.JSON(http.StatusOK, "Successfully deleted the blog")
-}
-func updateBlog(gctx *gin.Context) {
-	id := gctx.Param("id")
-	blogID, _ := strconv.Atoi(id)
-	blog := new(struct {
-		BlogTitle string
-	})
-	if err := gctx.ShouldBindJSON(&blog); err != nil {
-		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	blogupdated, err := start.UpdateBlog(ent.EntClient, blogID, blog.BlogTitle)
-	fmt.Println("updatedblog", blogupdated)
-	if err != nil {
-		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	gctx.JSON(http.StatusOK, "Successfully updated the blog")
-}
-func createBlog(gctx *gin.Context) {
-	newBlog := new(ent.Blogs)
-	if err := gctx.ShouldBindJSON(&newBlog); err != nil {
-		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	newBlog, err := start.CreateBlog(ent.EntClient, newBlog)
-	fmt.Println("newblog", newBlog)
-	if err != nil {
-		gctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	gctx.JSON(http.StatusOK, "Successfully created the blog")
 }

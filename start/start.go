@@ -1,4 +1,4 @@
-package ent
+package start
 
 import (
 	"context"
@@ -8,23 +8,10 @@ import (
 	"log"
 )
 
-func CreateUser(ctx context.Context, client *ent.Client) (*ent.User, error) {
-	u, err := client.User.
-		Create().
-		SetName("ayush").
-		SetPassword("dfxcghbjkl").
-		Save(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed creating user: %w", err)
-	}
-	log.Println("user was created: ", u)
-	return u, nil
-}
-
 func QueryUserByName(ctx context.Context, client *ent.Client, name string) (*ent.User, error) {
 	u, err := client.User.
 		Query().
-		Where(user.Name(name)).
+		Where(user.Username(name)).
 		// `Only` fails if no user found,
 		// or more than 1 user returned.
 		Only(ctx)

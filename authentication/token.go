@@ -13,7 +13,7 @@ import (
 
 func GenerateToken(user_id uint) (string, error) {
 
-	token_lifespan := 60
+	token_lifespan := 6
 
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true

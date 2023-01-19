@@ -3,7 +3,7 @@ package authentication
 import (
 	"context"
 	"entdemo/ent"
-	start "entdemo/ent/start"
+	start "entdemo/start"
 	"fmt"
 	"net/http"
 
@@ -21,7 +21,7 @@ func Register(c *gin.Context) {
 	ctx := context.Background()
 	_, err := ent.EntClient.User.
 		Create().
-		SetName(input.Name).SetPassword(input.Password).Save(ctx)
+		SetUsername(input.Username).SetPassword(input.Password).Save(ctx)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -36,7 +36,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token, err := LoginCheck(c, input.Name, input.Password)
+	token, err := LoginCheck(c, input.Username, input.Password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
